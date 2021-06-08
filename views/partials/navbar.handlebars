@@ -1,0 +1,24 @@
+<!-- views/partials/navbar.handlebars -->
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/">
+        Rotten Potatoes
+      </a>
+    </div>
+    <div class="pull-left">
+      <a href="/reviews/new" class="btn btn-default navbar-btn">New Review</a>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+      {{#if user}}
+      Hi {{user.username}}
+      <li><a href="/logout">Logout</a></li>
+      {{else}}
+      <li><a href="/login">Login</a></li>
+      <li><a href="/sign-up">Sign Up</a></li>
+      {{/if}}
+    </ul>
+  </div>
+</nav>
+
