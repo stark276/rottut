@@ -8,17 +8,19 @@
       </a>
     </div>
     <div class="pull-left">
+      {{#if currentUser}}
       <a href="/reviews/new" class="btn btn-default navbar-btn">New Review</a>
+      {{/if}}
     </div>
     <ul class="nav navbar-nav navbar-right">
-      {{#if user}}
-      Hi {{user.username}}
-      <li><a href="/logout">Logout</a></li>
-      {{else}}
-      <li><a href="/login">Login</a></li>
-      <li><a href="/sign-up">Sign Up</a></li>
-      {{/if}}
-    </ul>
+  {{#if currentUser}}
+    <li><a href="#">Hi {{currentUser.username}}!</a></li>
+    <li><a href="/logout">Logout</a></li>
+  {{else}}
+    <li><a href="/login">Login</a></li>
+    <li><a href="/sign-up">Sign Up</a></li>
+  {{/if}}
+</ul>
   </div>
 </nav>
 

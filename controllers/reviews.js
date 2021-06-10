@@ -5,9 +5,11 @@ module.exports = function (app) {
 
     // get home route, all reviews
     app.get('/', (req, res) => {
+        const currentUser = req.user;
+
         Review.find().lean()
             .then(reviews => {
-                res.render('reviews-index', { reviews: reviews });
+                res.render('reviews-index', { reviews: reviews, currentUser });
             })
             .catch(err => {
                 console.log(err);
@@ -16,19 +18,24 @@ module.exports = function (app) {
 
     // NEW REVIEW FORM (TEMPLATE)
     app.get('/reviews/new', (req, res) => {
+        const currentUser = req.user;
         res.render('reviews-new', {title: "Post a Review"})
     })
 
     // CREATING A REVIEW
     app.post('/reviews', (req, res) => {
-        Review.create(req.body)
+        
+            console.log(req.user);
+            Review.create(req.body)
             .then((review) => {
-                console.log(review);
+                // console.log(review);
                 res.redirect(`/reviews/${review._id}`)
             })
             .catch((err) => {
                 console.log(err.message);
             })
+        
+        
     })
 
     // GETTING SINGLE REVIEW
