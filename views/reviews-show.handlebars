@@ -7,6 +7,7 @@
     <h1>{{review.title}}</h1>
     <h2>{{review.movieTitle}}</h2>
     <p>{{review.description}}</p>
+    <div class="pull-right"> <small>Created by: </small>{{review.author.username}} </div>
     <p><a href="/reviews/{{review._id}}/edit">Edit</a></p>
     <p><form method="POST" action="/reviews/{{review._id}}?_method=DELETE">
         <button class="btn btn-primary" type="submit">Delete</button>
@@ -19,7 +20,8 @@
 
     {{#each comments}}
     {{> comment}}
-{{/each}}
+    <p class="text-right">{{comment.author.username}}</p>
+    {{/each}}
 
 
   </div>

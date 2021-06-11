@@ -1,15 +1,16 @@
 const Review = require('../models/review');
 const Comment = require('../models/comment');
+const User = require('../models/user');
 
 module.exports = function (app) {
 
-    // get home route, all reviews
+    // INDEX
     app.get('/', (req, res) => {
         const currentUser = req.user;
 
-        Review.find().lean()
+        Review.find({}).lean().populate('author')
             .then(reviews => {
-                res.render('reviews-index', { reviews: reviews, currentUser });
+                res.render('reviews-index', { reviews, currentUser });
             })
             .catch(err => {
                 console.log(err);
@@ -18,34 +19,44 @@ module.exports = function (app) {
 
     // NEW REVIEW FORM (TEMPLATE)
     app.get('/reviews/new', (req, res) => {
-        const currentUser = req.user;
+        
         res.render('reviews-new', {title: "Post a Review"})
     })
 
-    // CREATING A REVIEW
-    app.post('/reviews', (req, res) => {
-        
-            console.log(req.user);
-            Review.create(req.body)
-            .then((review) => {
-                // console.log(review);
-                res.redirect(`/reviews/${review._id}`)
+    // CREATE
+    app.post('/reviews/new', (req, res) => {
+        if (req.user) {
+        const userId = req.user._id;
+        const review = new Review(req.body);
+        review.author = userId;
+
+        review
+            .save()
+            .then(() => User.findById(userId))
+            .then((user) => {
+            user.reviews.unshift(review);
+            user.save();
+            // REDIRECT TO THE NEW review
+            return res.redirect(`/reviews/${review._id}`);
             })
-            .catch((err) => {
-                console.log(err.message);
-            })
-        
-        
-    })
+        .catch((err) => {
+          console.log(err.message);
+        });
+    } else {
+      return res.status(401); // UNAUTHORIZED
+    }
+  });
 
     // GETTING SINGLE REVIEW
     app.get('/reviews/:id', (req, res) => {
-        Review.findById(req.params.id)
+        const currentUser = req.user;
+
+        Review.findById(req.params.id).lean().populate('comments').populate('author')
             .then(review => {
             Comment.find({ reviewId: req.params.id })
                 .then(comments => {
                     res.render('reviews-show', 
-                    { review: review, comments: comments })
+                    { review, comments, currentUser })
                 })
             }).catch((err) => {
                 console.log(err.message);
