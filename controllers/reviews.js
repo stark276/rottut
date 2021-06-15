@@ -1,8 +1,10 @@
 const Review = require('../models/review');
 const Comment = require('../models/comment');
 const User = require('../models/user');
+const moment = require('moment');
 
 module.exports = function (app) {
+    
 
     // INDEX
     app.get('/', (req, res) => {
@@ -19,13 +21,13 @@ module.exports = function (app) {
 
     // NEW REVIEW FORM (TEMPLATE)
     app.get('/reviews/new', (req, res) => {
-        
         res.render('reviews-new', {title: "Post a Review"})
     })
 
     // CREATE
     app.post('/reviews/new', (req, res) => {
-        if (req.user) {
+        const currentUser = req.user;
+        if (currentUser) {
         const userId = req.user._id;
         const review = new Review(req.body);
         review.author = userId;
@@ -40,23 +42,32 @@ module.exports = function (app) {
             return res.redirect(`/reviews/${review._id}`);
             })
         .catch((err) => {
-          console.log(err.message);
+          console.log(err.message); 
         });
     } else {
       return res.status(401); // UNAUTHORIZED
     }
-  });
+    });
 
     // GETTING SINGLE REVIEW
     app.get('/reviews/:id', (req, res) => {
         const currentUser = req.user;
 
-        Review.findById(req.params.id).lean().populate('comments').populate('author')
+        Review.findById(req.params.id).populate('comments').lean()
+        
             .then(review => {
+                let createdAt = review.createdAt;
+                createdAt = moment(createdAt).format('MMMM Do YYYY');
+                review.createdAtFormatted = createdAt;
+                // fetch its comments
             Comment.find({ reviewId: req.params.id })
                 .then(comments => {
-                    res.render('reviews-show', 
-                    { review, comments, currentUser })
+                    let createdAt = review.createdAt;
+                    createdAt = moment(createdAt).format('MMMM Do YYYY');
+                    comments.createdAtFormatted = createdAt;
+                    comments.reverse();
+                    // respond with the template with both values
+                    res.render('reviews-show', { review, comments, currentUser })
                 })
             }).catch((err) => {
                 console.log(err.message);

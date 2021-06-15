@@ -2,11 +2,17 @@
   <div class="card-block">
     <h4 class="card-title">{{this.title}}</h4>
     <p class="card-text">{{this.content}}</p>
+    <p class="text-muted">replied on: {{this.createdAtFormatted}}</p>
+    
+   
 
     <p>
-        <form action="/reviews/comments/{{this._id}}?_method=DELETE" method="post">
+      <form action="/reviews/comments/{{this._id}}?_method=DELETE" method="post">
             <button type="submit">Delete</button>
-        </form>
+      </form>
+        <div class='text-right'>
+           <button type="submit"  class="btn btn-primary">Reply</button>
+        </div>
     </p>
 
   </div>
